@@ -1,0 +1,19 @@
+# fly.toml app configuration file generated for the-north-poll on 2023-11-20T16:22:18-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "the-north-poll"
+primary_region = "atl"
+
+[env]
+  AOC_YEAR=2018
+  AOC_LEADERBOARD=29858
+
+[build]
+
+[[services]]
+  auto_stop_machines = false
+  auto_start_machines = false
+  min_machines_running = 1
+  processes = ["app"]
