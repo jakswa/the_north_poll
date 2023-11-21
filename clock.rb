@@ -2,5 +2,8 @@ require 'clockwork'
 require './lib/poll'
 
 module Clockwork
-  every(15.minutes, 'poll.aoc', skip_first_run: true) { Poll.run }
+  (2015..2023).each.with_index do |year, index|
+    interval = 15 * (Time.now.year - year + 1) # extra 15min for each older year
+    every(interval.minutes, "poll.aoc.#{year}", skip_first_run: true) { Poll.run(year: year.to_s) }
+  end
 end

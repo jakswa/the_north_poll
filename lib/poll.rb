@@ -5,18 +5,21 @@ require 'json'
 
 class Poll
   # required ENV vars here
-  AOC_LEADERBOARD = ENV.fetch('AOC_LEADERBOARD')
   AOC_URL_TEMPLATE = 'https://adventofcode.com/%s/leaderboard/private/view/%s.json'
   DISCORD_URI = URI(ENV.fetch('DISCORD_WEBHOOK_URL'))
 
   # other constants here
-  AOC_YEAR = ENV.fetch('AOC_YEAR', 1.month.ago.year)
-  AOC_URI = URI(format(AOC_URL_TEMPLATE, AOC_YEAR, AOC_LEADERBOARD))
+  DEFAULT_AOC_YEAR = ENV.fetch('AOC_YEAR', 1.month.ago.year)
   TIME_WINDOW = ENV.fetch('TIME_WINDOW', '15-minutes')
     .split('-').tap { |arr| arr[0] = arr[0].to_i }
 
   def self.run(...)
     new(...).run
+  end
+
+  def initialize(year: DEFAULT_AOC_YEAR, leaderboard: ENV.fetch('AOC_LEADERBOARD'))
+    @aoc_year = year
+    @leaderboard = leaderboard
   end
 
   def run
@@ -27,9 +30,13 @@ class Poll
 
     return if members_changed.empty?
     content = members_changed.map do |member_id, member_attrs|
-      problem, stars = changed_problem(member_attrs)
-      star_count_words = stars.length > 1 ? 'stars' : 'star'
-      "#{member_attrs['name']} now has #{stars.length} #{star_count_words} on problem #{problem} (#{AOC_YEAR})"
+      msg = "- #{member_attrs['name']} is now up to #{member_attrs['stars']} stars for #{@aoc_year}!"
+
+      changed_problems(member_attrs).each do |problem, stars|
+        msg << "\n  - Day #{problem}: :star:"
+        msg << ':star2:' if stars.length == 2
+      end
+      msg
     end
     
     puts "Done. HTTP #{get_discord_response(content.join("\n")).code}."
@@ -39,10 +46,10 @@ class Poll
 
   # @return [Array<problem, star_count>] a list of problems that
   #   stars have appeared on within the last TIME_WINDOW
-  def changed_problem(member)
-    member['completion_day_level']&.find do |problem, stars|
+  def changed_problems(member)
+    member['completion_day_level']&.filter do |problem, stars|
       stars.find {|_star, star_attrs| Time.at(star_attrs&.dig('get_star_ts') || 0) > stars_since }
-    end
+    end || []
   end
 
   def get_discord_response(content)
@@ -56,10 +63,10 @@ class Poll
   def aoc_json
     return @aoc_json if defined?(@aoc_json)
 
-    req = Net::HTTP::Get.new(AOC_URI)
+    req = Net::HTTP::Get.new(aoc_uri)
     req['Cookie'] = ENV.fetch('AOC_SESSION_COOKIE')
 
-    res = Net::HTTP.start(AOC_URI.hostname, AOC_URI.port, use_ssl: true) do |http|
+    res = Net::HTTP.start(aoc_uri.hostname, aoc_uri.port, use_ssl: true) do |http|
       http.request(req)
     end
 
@@ -69,5 +76,9 @@ class Poll
   # ie 15.minutes.ago
   def stars_since
     TIME_WINDOW[0].send(TIME_WINDOW[1]).ago
+  end
+
+  def aoc_uri
+    @aoc_uri ||= URI(format(AOC_URL_TEMPLATE, @aoc_year, @leaderboard))
   end
 end
