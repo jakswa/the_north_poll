@@ -17,9 +17,10 @@ class Poll
     new(...).run
   end
 
-  def initialize(year: DEFAULT_AOC_YEAR, leaderboard: ENV.fetch('AOC_LEADERBOARD'))
+  def initialize(year: DEFAULT_AOC_YEAR, time_window: TIME_WINDOW, leaderboard: ENV.fetch('AOC_LEADERBOARD'))
     @aoc_year = year
     @leaderboard = leaderboard
+    @time_window = time_window
   end
 
   def run
@@ -45,7 +46,7 @@ class Poll
   private
 
   # @return [Array<problem, star_count>] a list of problems that
-  #   stars have appeared on within the last TIME_WINDOW
+  #   stars have appeared on within the last time_window
   def changed_problems(member)
     member['completion_day_level']&.filter do |problem, stars|
       stars.find {|_star, star_attrs| Time.at(star_attrs&.dig('get_star_ts') || 0) > stars_since }
@@ -75,7 +76,7 @@ class Poll
 
   # ie 15.minutes.ago
   def stars_since
-    TIME_WINDOW[0].send(TIME_WINDOW[1]).ago
+    @time_window[0].send(@time_window[1]).ago
   end
 
   def aoc_uri
