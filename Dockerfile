@@ -18,6 +18,7 @@ RUN apt-get update -qq && \
 
 # Install application gems
 COPY Gemfile* .
+RUN bundle config set without "development test"
 RUN bundle install
 
 
@@ -37,4 +38,4 @@ COPY --chown=ruby:ruby . .
 
 # Start the server
 EXPOSE 8080
-CMD ["bundle", "exec", "clockwork", "clock.rb"]
+CMD ["bundle", "exec", "clockwork", "lib/clock.rb"]

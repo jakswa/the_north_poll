@@ -1,22 +1,33 @@
 # frozen_string_literal: true
 
+require 'active_support/all'
 require 'net/http'
 require 'json'
 
 class Poll
   # required ENV vars here
-  AOC_URL_TEMPLATE = 'https://adventofcode.com/%s/leaderboard/private/view/%s.json'
+  AOC_SESSION_COOKIE = ENV.fetch('AOC_SESSION_COOKIE')
   DISCORD_URI = URI(ENV.fetch('DISCORD_WEBHOOK_URL'))
 
   # other constants here
+  AOC_URL_TEMPLATE = 'https://adventofcode.com/%s/leaderboard/private/view/%s.json'
   DEFAULT_AOC_YEAR = ENV.fetch('AOC_YEAR', 1.month.ago.year)
   TIME_WINDOW = ENV.fetch('TIME_WINDOW', '15-minutes')
     .split('-').tap { |arr| arr[0] = arr[0].to_i }
+
+  def self.interval_with_jitter(year, index)
+    # older years have lower priority, get bigger poll intervals
+    interval = (15 * (Time.now.year - year + 1)).minutes
+    
+    # space out the herd over time, otherwise fast-firing http clumps
+    interval + (rand(15) + index).seconds
+  end
 
   def self.run(...)
     new(...).run
   end
 
+  # leaderboard is only required if you don't pass one in
   def initialize(year: DEFAULT_AOC_YEAR, time_window: TIME_WINDOW, leaderboard: ENV.fetch('AOC_LEADERBOARD'))
     @aoc_year = year
     @leaderboard = leaderboard
@@ -65,7 +76,7 @@ class Poll
     return @aoc_json if defined?(@aoc_json)
 
     req = Net::HTTP::Get.new(aoc_uri)
-    req['Cookie'] = ENV.fetch('AOC_SESSION_COOKIE')
+    req['Cookie'] = 
 
     res = Net::HTTP.start(aoc_uri.hostname, aoc_uri.port, use_ssl: true) do |http|
       http.request(req)

@@ -11,6 +11,9 @@ GEM
       minitest (>= 5.1)
       mutex_m
       tzinfo (~> 2.0)
+    addressable (2.8.5)
+      public_suffix (>= 2.0.2, < 6.0)
+    attr_extras (7.1.0)
     base64 (0.2.0)
     bigdecimal (3.1.4)
     clockwork (3.0.2)
@@ -18,22 +21,47 @@ GEM
       tzinfo
     concurrent-ruby (1.2.2)
     connection_pool (2.4.1)
+    crack (0.4.5)
+      rexml
+    diff-lcs (1.5.0)
+    dotenv (2.8.1)
     drb (2.2.0)
       ruby2_keywords
+    hashdiff (1.0.1)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     minitest (5.20.0)
     mutex_m (0.2.0)
+    optimist (3.1.0)
+    patience_diff (1.2.0)
+      optimist (~> 3.0)
+    public_suffix (5.0.4)
+    rexml (3.2.6)
     ruby2_keywords (0.0.5)
+    super_diff (0.10.0)
+      attr_extras (>= 6.2.4)
+      diff-lcs
+      patience_diff
+    tldr (0.9.5)
+      concurrent-ruby (~> 1.2)
+      super_diff (~> 0.10)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    webmock (3.19.1)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
 
 PLATFORMS
   arm64-darwin-21
   arm64-darwin-22
+  x86_64-linux
 
 DEPENDENCIES
   clockwork (~> 3.0)
+  dotenv (~> 2.8)
+  tldr (~> 0.9.5)
+  webmock (~> 3.19)
 
 BUNDLED WITH
    2.4.10
