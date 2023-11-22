@@ -4,6 +4,7 @@ require 'active_support/all'
 require 'net/http'
 require 'json'
 
+# A poller class that does aoc/discord HTTP
 class Poll
   # required ENV vars here
   AOC_SESSION_COOKIE = ENV.fetch('AOC_SESSION_COOKIE')
@@ -35,14 +36,14 @@ class Poll
   end
 
   def run
-    members_changed = aoc_json['members'].filter do |member_id, attrs|
+    members_changed = aoc_json['members'].filter do |_member_id, attrs|
       last_star = attrs['last_star_ts']
       last_star && Time.at(last_star) > stars_since
     end
 
     return if members_changed.empty?
 
-    content = members_changed.map do |member_id, member_attrs|
+    content = members_changed.map do |_member_id, member_attrs|
       msg = "- #{member_attrs['name']} is now up to #{member_attrs['stars']} stars for #{@aoc_year}!"
 
       changed_problems(member_attrs).each do |problem, stars|
@@ -60,7 +61,7 @@ class Poll
   # @return [Array<problem, star_count>] a list of problems that
   #   stars have appeared on within the last time_window
   def changed_problems(member)
-    member['completion_day_level']&.filter do |problem, stars|
+    member['completion_day_level']&.filter do |_problem, stars|
       stars.find { |_star, star_attrs| Time.at(star_attrs&.dig('get_star_ts') || 0) > stars_since }
     end || []
   end

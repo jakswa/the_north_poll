@@ -3,10 +3,10 @@
 require 'poll'
 
 class PollHttpTest < TLDR
-  BLANK_BODY = %[{"members":[]}]
-  DUSTY_BODY = %[{"members":{"1": { "name": "dusty", "last_star_ts": #{5.years.ago.to_i}}}}]
+  BLANK_BODY = %({"members":[]})
+  DUSTY_BODY = %({"members":{"1": { "name": "dusty", "last_star_ts": #{5.years.ago.to_i}}}}).freeze
 
-  def stub_and_run(aoc_body: BLANK_BODY, member: 'dusty', leaderboard:)
+  def stub_and_run(leaderboard:, aoc_body: BLANK_BODY, member: 'dusty')
     aoc_http = stub_request(:get, /adventofcode.*#{leaderboard}/).to_return(body: aoc_body)
     discord_http = stub_request(:post, /discord/).with(body: /#{member}/).to_return(status: 201)
     Poll.run(leaderboard:)
@@ -34,7 +34,7 @@ class PollHttpTest < TLDR
   private
 
   def active_body
-    completion = %["completion_day_level": { "1": {"1": {"get_star_ts":#{5.seconds.ago.to_i}}}}]
-    %[{"members":{"1": { "name": "activia", "last_star_ts": #{5.seconds.ago.to_i}, #{completion} }}}]
+    completion = %("completion_day_level": { "1": {"1": {"get_star_ts":#{5.seconds.ago.to_i}}}})
+    %({"members":{"1": { "name": "activia", "last_star_ts": #{5.seconds.ago.to_i}, #{completion} }}})
   end
 end
