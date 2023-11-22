@@ -51,7 +51,7 @@ class Poll
       msg
     end
     
-    puts "Done. HTTP #{get_discord_response(content.join("\n")).code}."
+    get_discord_response(content.join("\n"))
   end
 
   private
