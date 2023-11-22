@@ -13,12 +13,12 @@ class Poll
   AOC_URL_TEMPLATE = 'https://adventofcode.com/%s/leaderboard/private/view/%s.json'
   DEFAULT_AOC_YEAR = ENV.fetch('AOC_YEAR', 1.month.ago.year)
   TIME_WINDOW = ENV.fetch('TIME_WINDOW', '15-minutes')
-    .split('-').tap { |arr| arr[0] = arr[0].to_i }
+                   .split('-').tap { |arr| arr[0] = arr[0].to_i }
 
   def self.interval_with_jitter(year, index)
     # older years have lower priority, get bigger poll intervals
     interval = (15 * (Time.now.year - year + 1)).minutes
-    
+
     # space out the herd over time, otherwise fast-firing http clumps
     interval + (rand(15) + index).seconds
   end
@@ -41,6 +41,7 @@ class Poll
     end
 
     return if members_changed.empty?
+
     content = members_changed.map do |member_id, member_attrs|
       msg = "- #{member_attrs['name']} is now up to #{member_attrs['stars']} stars for #{@aoc_year}!"
 
@@ -50,7 +51,7 @@ class Poll
       end
       msg
     end
-    
+
     get_discord_response(content.join("\n"))
   end
 
@@ -60,7 +61,7 @@ class Poll
   #   stars have appeared on within the last time_window
   def changed_problems(member)
     member['completion_day_level']&.filter do |problem, stars|
-      stars.find {|_star, star_attrs| Time.at(star_attrs&.dig('get_star_ts') || 0) > stars_since }
+      stars.find { |_star, star_attrs| Time.at(star_attrs&.dig('get_star_ts') || 0) > stars_since }
     end || []
   end
 
@@ -76,11 +77,10 @@ class Poll
     return @aoc_json if defined?(@aoc_json)
 
     req = Net::HTTP::Get.new(aoc_uri)
-    req['Cookie'] = 
-
-    res = Net::HTTP.start(aoc_uri.hostname, aoc_uri.port, use_ssl: true) do |http|
-      http.request(req)
-    end
+    req['Cookie'] =
+      res = Net::HTTP.start(aoc_uri.hostname, aoc_uri.port, use_ssl: true) do |http|
+        http.request(req)
+      end
 
     @aoc_json = JSON.parse(res.body)
   end

@@ -8,3 +8,5 @@ gem "tldr", "~> 0.9.5", :groups => [:development, :test]
 gem "webmock", "~> 3.19", :groups => [:development, :test]
 
 gem "dotenv", "~> 2.8", :groups => [:development, :test]
+
+gem "rubocop", "~> 1.57", :groups => [:development, :test]
