@@ -10,7 +10,7 @@ class PollTest < TLDR
   def test_interval_for_2015
     interval = Poll.interval_with_jitter(2015, 0)
     expected_min = 9 * 15.minutes
-    assert(interval > expected_min)
+    assert(interval >= expected_min)
     assert(interval < (expected_min + 30.seconds))
   end
 end
