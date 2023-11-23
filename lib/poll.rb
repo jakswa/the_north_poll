@@ -13,8 +13,6 @@ class Poll
   # other constants here
   AOC_URL_TEMPLATE = 'https://adventofcode.com/%s/leaderboard/private/view/%s.json'
   DEFAULT_AOC_YEAR = ENV.fetch('AOC_YEAR', 1.month.ago.year)
-  TIME_WINDOW = ENV.fetch('TIME_WINDOW', '15-minutes')
-                   .split('-').tap { |arr| arr[0] = arr[0].to_i }
 
   def self.interval_with_jitter(year, index)
     # older years have lower priority, get bigger poll intervals
@@ -29,7 +27,7 @@ class Poll
   end
 
   # leaderboard is only required if you don't pass one in
-  def initialize(year: DEFAULT_AOC_YEAR, time_window: TIME_WINDOW, leaderboard: ENV.fetch('AOC_LEADERBOARD'))
+  def initialize(year: DEFAULT_AOC_YEAR, time_window: nil, leaderboard: ENV.fetch('AOC_LEADERBOARD'))
     @aoc_year = year
     @leaderboard = leaderboard
     @time_window = time_window
@@ -88,7 +86,13 @@ class Poll
 
   # ie 15.minutes.ago
   def stars_since
-    @time_window[0].send(@time_window[1]).ago
+    @time_window ||= 
+      begin
+        arr = ENV.fetch('TIME_WINDOW', '15-minutes')
+           .split('-').tap { |arr| arr[0] = arr[0].to_i }
+        arr[0].send(arr[1])
+      end
+    @time_window.ago
   end
 
   def aoc_uri

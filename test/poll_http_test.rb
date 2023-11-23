@@ -9,7 +9,7 @@ class PollHttpTest < TLDR
   def stub_and_run(leaderboard:, aoc_body: BLANK_BODY, member: 'dusty')
     aoc_http = stub_request(:get, /adventofcode.*#{leaderboard}/).to_return(body: aoc_body)
     discord_http = stub_request(:post, /discord/).with(body: /#{member}/).to_return(status: 201)
-    Poll.run(leaderboard:)
+    Poll.run(leaderboard:, time_window: 15.minutes)
     [aoc_http, discord_http]
   end
 

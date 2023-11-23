@@ -10,7 +10,7 @@ module Clockwork
     task_name = "poll.aoc.#{year}.#{interval.iso8601}"
 
     every(interval, task_name, skip_first_run: true) do
-      Poll.run(year: year.to_s, time_window: [interval, 'minutes'])
+      Poll.run(year: year.to_s, time_window: interval.minutes)
     end
   end
 end
