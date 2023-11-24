@@ -4,7 +4,7 @@ require 'poll'
 
 class PollHttpTest < TLDR
   BLANK_BODY = %({"members":[]})
-  DUSTY_BODY = %({"members":{"1": { "name": "dusty", "last_star_ts": #{5.years.ago.to_i}}}}).freeze
+  DUSTY_BODY = %({"members":{"1": { "name": "dusty", "last_star_ts": #{16.minutes.ago.to_i}}}}).freeze
 
   def stub_and_run(leaderboard:, aoc_body: BLANK_BODY, member: 'dusty')
     aoc_http = stub_request(:get, /adventofcode.*#{leaderboard}/).to_return(body: aoc_body)

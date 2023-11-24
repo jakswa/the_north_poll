@@ -10,3 +10,7 @@ gem 'webmock', '~> 3.19', groups: %i[development test]
 gem 'dotenv', '~> 2.8', groups: %i[development test]
 
 gem 'rubocop', '~> 1.57', groups: %i[development test]
+
+gem "solargraph", "~> 0.49.0", :group => :development
+
+gem "activesupport", "~> 7.1"
