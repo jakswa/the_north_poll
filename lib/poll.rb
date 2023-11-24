@@ -76,10 +76,11 @@ class Poll
     return @aoc_json if defined?(@aoc_json)
 
     req = Net::HTTP::Get.new(aoc_uri)
-    req['Cookie'] =
-      res = Net::HTTP.start(aoc_uri.hostname, aoc_uri.port, use_ssl: true) do |http|
-        http.request(req)
-      end
+    req['Cookie'] = AOC_SESSION_COOKIE
+
+    res = Net::HTTP.start(aoc_uri.hostname, aoc_uri.port, use_ssl: true) do |http|
+      http.request(req)
+    end
 
     @aoc_json = JSON.parse(res.body)
   end
