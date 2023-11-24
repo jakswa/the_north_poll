@@ -41,20 +41,21 @@ class Poll
 
     return if members_changed.empty?
 
-    content = members_changed.map do |_member_id, member_attrs|
-      msg = "- #{member_attrs['name']} is now up to #{member_attrs['stars']} stars for #{@aoc_year}!"
-
-      changed_problems(member_attrs).each do |problem, stars|
-        msg << "\n  - Day #{problem}: :star:"
-        msg << ':star2:' if stars.length == 2
-      end
-      msg
-    end
-
+    content = members_changed.map { |_id, member_attrs| content_for(member_attrs) }
     get_discord_response(content.join("\n"))
   end
 
   private
+
+  def content_for(member_attrs)
+    msg = "- #{member_attrs['name']} is now up to #{member_attrs['stars']} stars for #{@aoc_year}!"
+
+    changed_problems(member_attrs).each do |problem, stars|
+      msg << "\n  - Day #{problem}: :star:"
+      msg << ':star2:' if stars.length == 2
+    end
+    msg
+  end
 
   # @return [Array<problem, star_count>] a list of problems that
   #   stars have appeared on within the last time_window
@@ -87,10 +88,10 @@ class Poll
 
   # ie 15.minutes.ago
   def stars_since
-    @time_window ||= 
+    @time_window ||=
       begin
         arr = ENV.fetch('TIME_WINDOW', '15-minutes')
-           .split('-').tap { |arr| arr[0] = arr[0].to_i }
+                 .split('-').tap { |win| win[0] = win[0].to_i }
         arr[0].send(arr[1])
       end
     @time_window.ago

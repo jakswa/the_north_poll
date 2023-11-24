@@ -32,3 +32,5 @@ jobs:
         run: bundle install
       - name: Run tests
         run: bundle exec tldr
+      - name: Lint code
+        run: bundle exec rubocop lib test
