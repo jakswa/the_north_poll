@@ -13,6 +13,15 @@ class Poll
   # other constants here
   AOC_URL_TEMPLATE = 'https://adventofcode.com/%s/leaderboard/private/view/%s.json'
   DEFAULT_AOC_YEAR = ENV.fetch('AOC_YEAR', 1.month.ago.year)
+  GREETINGS = [
+    "Santa's elves are impressed!",
+    "Santa's workshop is buzzing with joy!",
+    'Sleigh bells ring, are you done debugging?',
+    'Elves and reindeer cheer, for a programmer so dear!',
+    "Sleigh through the algorithms, you've made it look easy.",
+    'Coding through the snow, your keyboard all aglow!',
+    "In the North Pole's snowy embrace, your coding skills have found their place!"
+  ].freeze
 
   def self.interval_with_jitter(year, index)
     # older years have lower priority, get bigger poll intervals
@@ -41,7 +50,8 @@ class Poll
 
     return if members_changed.empty?
 
-    content = members_changed.map { |_id, member_attrs| content_for(member_attrs) }
+    content = [GREETINGS.sample]
+    content.concat(members_changed.map { |_id, member_attrs| content_for(member_attrs) })
     get_discord_response(content.join("\n"))
   end
 
