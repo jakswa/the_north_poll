@@ -4,6 +4,8 @@ require 'active_support/all'
 require 'net/http'
 require 'json'
 
+require_relative './post_message'
+
 # A poller class that does aoc/discord HTTP
 class Poll
   # required ENV vars here
@@ -42,7 +44,7 @@ class Poll
     return if members_changed.empty?
 
     content = members_changed.map { |_id, member_attrs| content_for(member_attrs) }
-    get_discord_response(content.join("\n"))
+    PostMessage.send(content)
   end
 
   private
@@ -63,14 +65,6 @@ class Poll
     member['completion_day_level']&.filter do |_problem, stars|
       stars.find { |_star, star_attrs| Time.at(star_attrs&.dig('get_star_ts') || 0) > stars_since }
     end || []
-  end
-
-  def get_discord_response(content)
-    discord_req = Net::HTTP::Post.new(DISCORD_URI)
-    discord_req.set_form_data(content:)
-    Net::HTTP.start(DISCORD_URI.hostname, DISCORD_URI.port, use_ssl: true) do |http|
-      http.request(discord_req)
-    end
   end
 
   def aoc_json
