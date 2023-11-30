@@ -5,9 +5,9 @@ require 'net/http'
 class PostMessage
   def self.send(text)
     if ENV['SLACK_WEBHOOK_URL']
-      payload = { text:, icon_url: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+      payload = { text:, icon_emoji: ':santa:',
                   username: 'The North Poll' }
-      Net::HTTP.post(
+      resp = Net::HTTP.post(
         URI(ENV['SLACK_WEBHOOK_URL']),
         payload.to_json,
         'Content-Type' => 'application/json'

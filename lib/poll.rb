@@ -10,7 +10,6 @@ require_relative './post_message'
 class Poll
   # required ENV vars here
   AOC_SESSION_COOKIE = ENV.fetch('AOC_SESSION_COOKIE')
-  DISCORD_URI = URI(ENV.fetch('DISCORD_WEBHOOK_URL'))
 
   # other constants here
   AOC_URL_TEMPLATE = 'https://adventofcode.com/%s/leaderboard/private/view/%s.json'
@@ -44,7 +43,7 @@ class Poll
     return if members_changed.empty?
 
     content = members_changed.map { |_id, member_attrs| content_for(member_attrs) }
-    PostMessage.send(content)
+    PostMessage.send(content.join("\n"))
   end
 
   private
