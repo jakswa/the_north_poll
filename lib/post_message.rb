@@ -12,6 +12,7 @@ class PostMessage
         payload.to_json,
         'Content-Type' => 'application/json'
       )
+      raise "slack API error: #{resp.body}" unless resp.code.to_i.between?(200, 299)
     elsif ENV['DISCORD_WEBHOOK_URL']
       discord_uri = URI(ENV['DISCORD_WEBHOOK_URL'])
       discord_req = Net::HTTP::Post.new(discord_uri)
