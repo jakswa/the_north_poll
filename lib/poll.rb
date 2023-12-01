@@ -35,20 +35,42 @@ class Poll
   end
 
   def run
-    members_changed = aoc_json['members'].filter do |_member_id, attrs|
-      last_star = attrs['last_star_ts']
-      last_star && Time.at(last_star) > stars_since
-    end
-
     return if members_changed.empty?
 
-    content = members_changed.map { |_id, member_attrs| content_for(member_attrs) }
-    PostMessage.send(content.join("\n"))
+    PostMessage.send(message_content)
   end
 
   private
 
-  def content_for(member_attrs)
+  def single_line_content?
+    members_changed.length == 1 && changed_problems(members_changed.first).length == 1
+  end
+
+  def message_content
+    return singular_content(members_changed.first) if single_line_content?
+
+    members_changed
+      .map { |attrs| bulleted_content_for(attrs) }
+      .join("\n")
+  end
+
+  def members_changed
+    @members_changed ||= aoc_json['members'].values.filter do |attrs|
+      last_star = attrs['last_star_ts']
+      last_star && Time.at(last_star) > stars_since
+    end
+  end
+
+  # intending to take up less space and be less spammy/noisy
+  def singular_content(attrs)
+    problem, stars = changed_problems(attrs).first
+    star_text = ':star:'
+    star_text += ':star2:' if stars.length > 1
+    star_text += " on #{@aoc_year}" if @aoc_year != DEFAULT_AOC_YEAR
+    ":new: #{star_text} on day #{problem}. That's #{attrs['stars']}/50 stars for #{attrs['name']}."
+  end
+
+  def bulleted_content_for(member_attrs)
     msg = "- #{member_attrs['name']} is now up to #{member_attrs['stars']} stars for #{@aoc_year}!"
 
     changed_problems(member_attrs).each do |problem, stars|
@@ -63,7 +85,7 @@ class Poll
   def changed_problems(member)
     member['completion_day_level']&.filter do |_problem, stars|
       stars.find { |_star, star_attrs| Time.at(star_attrs&.dig('get_star_ts') || 0) > stars_since }
-    end || []
+    end || {}
   end
 
   def aoc_json
