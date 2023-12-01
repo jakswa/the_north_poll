@@ -13,7 +13,7 @@ class Poll
 
   # other constants here
   AOC_URL_TEMPLATE = 'https://adventofcode.com/%s/leaderboard/private/view/%s.json'
-  DEFAULT_AOC_YEAR = ENV.fetch('AOC_YEAR', 1.month.ago.year)
+  DEFAULT_AOC_YEAR = ENV.fetch('AOC_YEAR', 1.month.ago.year.to_s)
 
   def self.interval_with_jitter(year, index)
     # older years have lower priority, get bigger poll intervals
