@@ -6,10 +6,6 @@
 app = "the-north-poll"
 primary_region = "atl"
 
-[env]
-  AOC_YEAR=2018
-  AOC_LEADERBOARD=29858
-
 [build]
 
 [[services]]
